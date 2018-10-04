@@ -2,14 +2,14 @@ run-title: "TripletMnist"
 
 paths:
   save: "Models/2"
-  load: "Models/2/model.10-0.0036.h5"
+  load: "Models/2/model.14-0.0065.h5"
 
 train:
   lr: 0.001
   optim: "Nadam"
 
   epochs: 100
-  batch-size: 500
+  batch-size: 400
 
   loss: "semi-hard-triplet-loss"
   alpha: 0.2

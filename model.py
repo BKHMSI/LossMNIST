@@ -1,6 +1,8 @@
+import keras.backend as K 
+
 from keras.models import Model
 from keras.layers import Conv2D, MaxPooling2D, Input
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout, Flatten, Lambda
 
 def get_model(input_shape, config, top = True):
     input_img = Input(input_shape)
@@ -21,6 +23,6 @@ def get_model(input_shape, config, top = True):
 
     x = __body(input_img)
     if top: x = __head(x)
-
+    
     model = Model(inputs=input_img, outputs=x)
     return model

@@ -18,7 +18,7 @@ def scatter(x, labels, config):
 
     plt.switch_backend('agg')
     fig, ax = plt.subplots()
-    ax.scatter(x[:,0], x[:,1], lw=0, s=40, c=palette[labels.astype(np.int)], label=labels.astype(np.int))
+    ax.scatter(x[:,0], x[:,1], lw=0, s=40, alpha=0.3, c=palette[labels.astype(np.int)])
 
     for idx in range(config["data"]["num_classes"]):
         xtext, ytext = np.median(x[labels == idx, :], axis=0)

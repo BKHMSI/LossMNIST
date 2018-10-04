@@ -24,6 +24,11 @@ class DataLoader(object):
         self.Y_train = np_utils.to_categorical(self.y_train, self.config["num_classes"])
         self.Y_test = np_utils.to_categorical(self.y_test, self.config["num_classes"])
 
+        self.num_train = int(self.y_train.shape[0] * (1-self.config["val_split"]))
+        self.num_val   = int(self.y_train.shape[0] * (self.config["val_split"]))
+        self.num_test  = self.y_test.shape[0]
+
+
     def preprocess(self, data):
         data = data.astype('float32')
         data = data - self.mean  

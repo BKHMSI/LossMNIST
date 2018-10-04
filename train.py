@@ -15,6 +15,7 @@ from model import get_model
 
 def get_loss_function(config):
     return {
+        'large-margin-cosine-loss': None,
         'semi-hard-triplet-loss': semi_hard_triplet_loss(config["train"]["alpha"]),
         'categorical-crossentropy': losses.categorical_crossentropy,
     }.get(config["train"]["loss"], losses.categorical_crossentropy)
@@ -54,8 +55,8 @@ if __name__ == "__main__":
     checkpoint = ModelCheckpoint(os.path.join(paths["save"],"model.{epoch:02d}-{val_loss:.4f}.h5"), monitor='val_loss', save_best_only=True, mode='min')
 
     model.fit(dataloader.X_train, dataloader.y_train,
-        batch_size=train["batch-size"],
         epochs=train["epochs"],
+        batch_size=train["batch-size"],
         verbose=1,
         shuffle=True,
         validation_split=data["val_split"],
