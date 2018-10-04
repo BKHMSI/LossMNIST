@@ -6,10 +6,18 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import keras.optimizers
+from keras import losses
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
+from loss import *
 from data import DataLoader
 from model import get_model
+
+def get_loss_function(config):
+    return {
+        'semi-hard-triplet-loss': semi_hard_triplet_loss(config["train"]["alpha"]),
+        'categorical-crossentropy': losses.categorical_crossentropy,
+    }.get(config["train"]["loss"], losses.categorical_crossentropy)
 
 if __name__ == "__main__":
 
@@ -33,17 +41,19 @@ if __name__ == "__main__":
     dataloader.load()
 
     input_shape = (data["imsize"], data["imsize"], data["imchannel"])
-    model = get_model(input_shape, config)
+    model = get_model(input_shape, config, top=config["train"]["loss"]=="categorical-crossentropy")
 
     if train["resume"]: 
         model.load_weights(paths["load"], by_name=True)
 
+    loss_func = get_loss_function(config)
+
     optim = getattr(keras.optimizers, train["optim"])(train["lr"])
-    model.compile(loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=optim, metrics=[])
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=train["lr_reduce_factor"], patience=train["patience"], min_lr=train["min_lr"])
     checkpoint = ModelCheckpoint(os.path.join(paths["save"],"model.{epoch:02d}-{val_loss:.4f}.h5"), monitor='val_loss', save_best_only=True, mode='min')
 
-    model.fit(dataloader.X_train, dataloader.Y_train,
+    model.fit(dataloader.X_train, dataloader.y_train,
         batch_size=train["batch-size"],
         epochs=train["epochs"],
         verbose=1,

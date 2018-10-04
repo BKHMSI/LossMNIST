@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     model.load_weights(paths["load"], by_name=True)
 
-    X_batch, y_batch = dataloader.get_random_batch(k = 200)
+    X_batch, y_batch = dataloader.get_random_batch(k = 500)
 
     embeddings = model.predict(X_batch, batch_size=config["train"]["batch-size"], verbose=1)
 
