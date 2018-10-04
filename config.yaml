@@ -1,0 +1,29 @@
+run-title: "SoftmaxMnist"
+
+paths:
+  save: "Models/1"
+  load: "Models/1/model.09-0.0365.h5"
+
+train:
+  lr: 0.001
+  optim: "Nadam"
+
+  epochs: 100
+  batch-size: 200
+
+  loss: "categorical_crossentropy"
+  alpha: 0.2
+
+  lr_reduce_factor: 0.5
+  patience: 5
+  min_lr: 1.0e-5
+
+  resume: False
+
+data:
+  imsize: 28 
+  imchannel: 1
+  num_classes: 10
+
+  val_split: 0.1
+
