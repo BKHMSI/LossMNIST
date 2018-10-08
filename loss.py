@@ -31,9 +31,21 @@ def __semi_hard_triplet_loss(labels, embeddings, margin = 0.2):
 def __intra_enhanced_triplet_loss(labels, embeddings, lambda_1, alpha, beta, batch_size, k):
     return tf.add(__semi_hard_triplet_loss(labels, embeddings, alpha), tf.multiply(lambda_1, __anchor_center_loss(embeddings, beta, batch_size, k)))
 
-def __large_margin_cos_loss(labels, embeddings):
-    loss = tf.constant(0, dtype='float32')
-    return loss 
+def __large_margin_cos_loss(labels, embeddings, alpha, scale, num_cls):
+    num_features = embeddings.get_shape()[1]
+    
+    weights = tf.get_variable("centers", [num_features, num_cls], dtype=tf.float32, 
+            initializer=tf.contrib.layers.xavier_initializer(), trainable=True)
+
+    embedds_feat_norm = tf.nn.l2_normalize(embeddings, 1, 1e-10)
+    weights_feat_norm = tf.nn.l2_normalize(weights, 0, 1e-10)
+
+    xw_norm = tf.matmul(embedds_feat_norm, weights_feat_norm)
+
+    # value = something
+
+    cos_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=value))
+    return cos_loss 
 
 def semi_hard_triplet_loss(margin):
     @functools.wraps(__semi_hard_triplet_loss)
@@ -41,14 +53,14 @@ def semi_hard_triplet_loss(margin):
         return __semi_hard_triplet_loss(labels, embeddings, margin)
     return loss
 
-def intra_enhanced_triplet_loss(train, data):
+def intra_enhanced_triplet_loss(config):
     @functools.wraps(__intra_enhanced_triplet_loss)
     def loss(labels, embeddings):
-        return __intra_enhanced_triplet_loss(labels, embeddings, train["lambda_1"], train["alpha"], train["beta"], train["batch-size"], data["k_batch"])
+        return __intra_enhanced_triplet_loss(labels, embeddings, config["lambda_1"], config["alpha"], config["beta"], config["batch-size"], config["k_batch"])
     return loss
 
 def large_margin_cos_loss(config):
     @functools.wraps(__large_margin_cos_loss)
     def loss(labels, embeddings):
-        return __large_margin_cos_loss(labels, embeddings)
+        return __large_margin_cos_loss(labels, embeddings, config["alpha"], config["scale"])
     return loss

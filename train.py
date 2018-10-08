@@ -17,7 +17,7 @@ from model import get_model
 def get_loss_function(func):
     return {
         'large-margin-cosine-loss': large_margin_cos_loss(config["train"]),
-        'intra-enhanced-triplet-loss': intra_enhanced_triplet_loss(config["train"], config["data"]),
+        'intra-enhanced-triplet-loss': intra_enhanced_triplet_loss(config["train"]),
         'semi-hard-triplet-loss': semi_hard_triplet_loss(config["train"]["alpha"]),
         'categorical-crossentropy': losses.categorical_crossentropy,
     }.get(func, losses.categorical_crossentropy)
