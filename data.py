@@ -4,8 +4,9 @@ from keras.utils import np_utils
 from keras.datasets import mnist
 
 class DataLoader(object):
-    def __init__(self, config):
+    def __init__(self, config, one_hot = False):
         self.config = config
+        self.one_hot = one_hot
 
     def load(self):
         (X_train, self.y_train), (X_test, self.y_test) = mnist.load_data()
@@ -21,8 +22,9 @@ class DataLoader(object):
         self.X_train = self.preprocess(X_train)
         self.X_test  = self.preprocess(X_test)
 
-        self.Y_train = np_utils.to_categorical(self.y_train, self.config["num_classes"])
-        self.Y_test = np_utils.to_categorical(self.y_test, self.config["num_classes"])
+        if self.one_hot:
+            self.y_train = np_utils.to_categorical(self.y_train, self.config["num_classes"])
+            self.y_test = np_utils.to_categorical(self.y_test, self.config["num_classes"])
 
         self.num_train = int(self.y_train.shape[0] * (1-self.config["val_split"]))
         self.num_val   = int(self.y_train.shape[0] * (self.config["val_split"]))
@@ -38,9 +40,9 @@ class DataLoader(object):
     def get_random_batch(self, k = 100):
         X_batch, y_batch = [], []
         for label in range(self.config["num_classes"]):
-            mask = self.y_test==label
-            X_batch += [self.X_test[mask][np.random.choice(np.sum(mask), k, replace=False)]]
-            y_batch += [label] * k
-        X_batch = np.reshape(np.array(X_batch), self.input_shape)
+            X_mask = self.X_test[self.y_test==label]
+            X_batch.extend(np.array([X_mask[np.random.choice(len(X_mask), k, replace=False)]]) if k <= len(X_mask) and k >= 0 else X_mask)
+            y_batch += [label] * k if k <= len(X_mask) and k >= 0 else [label] * len(X_mask)
+        X_batch = np.reshape(X_batch, self.input_shape)
         return X_batch, np.array(y_batch)
 

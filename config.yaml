@@ -1,17 +1,17 @@
-run-title: "TripletMnist"
+run-title: "SoftmaxMnist"
 
 paths:
-  save: "Models/2"
-  load: "Models/2/model.14-0.0065.h5"
+  save: "Models/1"
+  load: ""
 
 train:
   lr: 0.001
   optim: "Nadam"
 
   epochs: 100
-  batch-size: 400
+  batch-size: 250
 
-  loss: "semi-hard-triplet-loss"
+  loss: "categorical-crossentropy"
   alpha: 0.2
 
   lr_reduce_factor: 0.5
