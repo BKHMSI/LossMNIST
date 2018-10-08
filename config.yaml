@@ -1,18 +1,21 @@
 run-title: "SoftmaxMnist"
 
 paths:
-  save: "Models/1"
-  load: ""
+  save: "Models/13"
+  load: "Models/11/model.78-0.0392.h5"
 
 train:
   lr: 0.001
   optim: "Nadam"
 
   epochs: 100
-  batch-size: 250
+  batch-size: 400
 
   loss: "categorical-crossentropy"
   alpha: 0.2
+  beta: 0.1
+  scale: 64
+  reg_lambda: 0.01
 
   lr_reduce_factor: 0.5
   patience: 5

@@ -21,7 +21,7 @@ class DataLoader(object):
 
         self.X_train = self.preprocess(X_train)
         self.X_test  = self.preprocess(X_test)
-
+        
         if self.one_hot:
             self.y_train = np_utils.to_categorical(self.y_train, self.config["num_classes"])
             self.y_test = np_utils.to_categorical(self.y_test, self.config["num_classes"])
@@ -33,10 +33,29 @@ class DataLoader(object):
 
     def preprocess(self, data):
         data = data.astype('float32')
-        data = data - self.mean  
-        data = data / self.std
-        return data
+        # data = data - self.mean  
+        # data = data / self.std
+        return data / 255.
 
+    def order_data_triplet_loss(self):
+        data = {}
+
+        for label in range(self.config["num_classes"]):
+            mask = self.y_train==label
+            data[label] = [i for i, x in enumerate(mask) if x]
+
+        p_batch = self.config["batch-size"] // self.config["k_batch"]
+        k_batch = self.config["k_batch"]
+
+        X_train, y_train = [], []
+        for i in range(p_batch):
+            for label in data:
+                X_train.extend(self.X_train[data[label][i*k_batch:(i+1)*k_batch]])
+                y_train += [label] * k_batch
+
+        self.X_train = X_train
+        self.y_train = y_train
+                    
     def get_random_batch(self, k = 100):
         X_batch, y_batch = [], []
         for label in range(self.config["num_classes"]):

@@ -12,7 +12,7 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, TensorBoard
 
 from loss import *
 from data import DataLoader
-from model import get_model
+from model import get_model, simple_resnet
 
 def get_loss_function(func):
     return {
@@ -40,18 +40,20 @@ if __name__ == "__main__":
     with open(os.path.join(paths["save"], config["run-title"] + ".yaml"), 'w') as outfile:
         yaml.dump(config, outfile)
 
-    dataloader = DataLoader(data, config["train"]["loss"]=="categorical-crossentropy")
+    dataloader = DataLoader(data, train["loss"]=="categorical-crossentropy")
     dataloader.load()
 
     input_shape = (data["imsize"], data["imsize"], data["imchannel"])
-    model = get_model(input_shape, config, top=config["train"]["loss"]=="categorical-crossentropy")
+    model = get_model(input_shape, config, top=train["loss"]=="categorical-crossentropy")
+    # model = simple_resnet(input_shape)
 
     if train["resume"]: 
         model.load_weights(paths["load"], by_name=True)
 
-    loss_func = get_loss_function(config["train"]["loss"])
+    metric = large_margin_cos_acc(train) if train["loss"]=="large-margin-cosine-loss" else 'acc'
+    loss_func = get_loss_function(train["loss"])
     optim = getattr(optimizers, train["optim"])(train["lr"])
-    model.compile(loss=loss_func, optimizer=optim, metrics=[])
+    model.compile(loss=loss_func, optimizer=optim, metrics=[metric])
 
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=train["lr_reduce_factor"], patience=train["patience"], min_lr=train["min_lr"])
     checkpoint = ModelCheckpoint(os.path.join(paths["save"],"model.{epoch:02d}-{val_loss:.4f}.h5"), monitor='val_loss', save_best_only=True, mode='min')
