@@ -1,8 +1,8 @@
-run-title: "SoftmaxMnist"
+run-title: "TripletMnist"
 
 paths:
-  save: "Models/13"
-  load: "Models/11/model.78-0.0392.h5"
+  save: "Models/14"
+  load: ""
 
 train:
   lr: 0.001
@@ -10,8 +10,9 @@ train:
 
   epochs: 100
   batch-size: 400
+  k_batch: 40
 
-  loss: "categorical-crossentropy"
+  loss: "semi-hard-triplet-loss"
   alpha: 0.2
   beta: 0.1
   scale: 64
@@ -21,6 +22,7 @@ train:
   patience: 5
   min_lr: 1.0e-5
 
+  shuffle: False
   resume: False
 
 data:
@@ -28,5 +30,5 @@ data:
   imchannel: 1
   num_classes: 10
 
+  samples_per_id: 6000
   val_split: 0.1
-

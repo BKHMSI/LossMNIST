@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from keras import backend as K
 
-def __anchor_center_loss(embeddings, margin, batch_size = 240, k = 4):
+def __anchor_center_loss(embeddings, margin, batch_size = 400, k = 40):
     """Computes the anchor-center loss
 
     Minimizes intra-class distances. Assumes embeddings are ordered 
