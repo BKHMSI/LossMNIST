@@ -17,7 +17,7 @@ train:
   beta: 0.1
   lambda_1: 0.5
   lambda_2: 0.1
-  scale: 30
+  scale: 20
   reg_lambda: 0.01
 
   lr_reduce_factor: 0.5

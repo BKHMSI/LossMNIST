@@ -9,6 +9,7 @@ The different loss functions used are mathematically defined below along with th
 First let's visualize t-SNE embeddings on the raw pixel data to give us a baseline of how the data is distributed before any clustering work is done.
 
 ### Raw Pixels 
+![Raw Pixels](./images/tsne/pixels/png "Raw Pixels")
 
 
 ### Categorical Cross-Entropy (Softmax)
