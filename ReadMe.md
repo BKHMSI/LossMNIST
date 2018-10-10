@@ -9,7 +9,7 @@ The different loss functions used are mathematically defined below along with th
 First let's visualize t-SNE embeddings on the raw pixel data to give us a baseline of how the data is distributed before any clustering work is done.
 
 ### Raw Pixels (Baseline)
-<p align="center"><img with="50%" src="./images/tsne/pixels.png"></p>
+<p align="center"><img width="50%" src="./images/tsne/pixels.png"></p>
 
 ### Categorical Cross-Entropy (Softmax)
 <table><tr>
@@ -64,5 +64,7 @@ TBD
 
 ### Contrastive Loss
 TBD
+
+---
 
 > In any experiment using triplet loss, the data was ordered such that within each mini-batch there must be k samples for each class.
