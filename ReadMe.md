@@ -8,24 +8,35 @@ I used the MNIST dataset provided by ```keras.datasets.mnist``` splitting the tr
 The different loss functions used are mathematically defined below along with the results of each on the testing set. 
 First let's visualize t-SNE embeddings on the raw pixel data to give us a baseline of how the data is distributed before any clustering work is done.
 
-### Raw Pixels 
-![Raw Pixels](./images/tsne/pixels/png "Raw Pixels")
-
+### Raw Pixels (Baseline)
+<table><tr><td align="center"><img src="./images/tsne/pixels.png"></td></tr></table>
 
 ### Categorical Cross-Entropy (Softmax)
-TBD
+<table><tr>
+  <td align="center"><img src="./images/functions/softmax.png"></td>
+  <td align="center"><img src="./images/tsne/softmax_13.png"></td>
+</tr></table>
 
 ### Semi-Hard Triplet Loss
-TBD
+<table><tr>
+  <td align="center"><img src="./images/functions/triplet.png"></td>
+  <td align="center"><img src="./images/tsne/triplet_14.png"></td>
+</tr></table>
 
 ### Large Margin Cosine Loss
-TBD
+<table><tr>
+  <td align="center"><img src="./images/functions/lmcl.png"></td>
+  <td align="center"><img src="./images/tsne/lmcl_19.png"></td>
+</tr></table>
 
 ### Intra-Enhanced Triplet Loss
-TBD
+<table><tr>
+  <td align="center"><img src="./images/functions/intra-triplet.png"></td>
+  <td align="center"><img src="./images/tsne/intra_17.png"></td>
+</tr></table>
 
 ### Semi-Hard Triplet Loss + Softmax
-TBD
+<table><tr><td align="center"><img src="./images/tsne/triplet_softmax_23.png"></td></tr></table>
 
 ### A-Softmax
 TBD
@@ -33,4 +44,4 @@ TBD
 ### Contrastive Loss
 TBD
 
-|> In any experiment using triplet loss, the data was ordered such that within each mini-batch there must be k samples for each class.
+> In any experiment using triplet loss, the data was ordered such that within each mini-batch there must be k samples for each class.
