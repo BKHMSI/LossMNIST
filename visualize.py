@@ -18,7 +18,7 @@ def scatter(x, labels, config):
 
     plt.switch_backend('agg')
     fig, ax = plt.subplots()
-    ax.scatter(x[:,0], x[:,1], lw=0, s=40, alpha=0.1, c=palette[labels.astype(np.int)])
+    ax.scatter(x[:,0], x[:,1], lw=0, s=40, alpha=0.2, c=palette[labels.astype(np.int)])
 
     for idx in range(config["data"]["num_classes"]):
         xtext, ytext = np.median(x[labels == idx, :], axis=0)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     paths = config["paths"]
     data = config["data"]
 
-    dataloader = DataLoader(data)
+    dataloader = DataLoader(config)
     dataloader.load()
 
     input_shape = (data["imsize"], data["imsize"], data["imchannel"])
@@ -51,6 +51,6 @@ if __name__ == "__main__":
     #embeddings = X_batch.reshape(-1, 784) 
     embeddings = model.predict(X_batch, batch_size=config["train"]["batch-size"], verbose=1)
 
-    tsne = TSNE(n_components=2, perplexity=30, verbose=1, n_iter=5000)
+    tsne = TSNE(n_components=2, perplexity=config["tsne"]["perplexity"], verbose=1, n_iter=config["tsne"]["n_iter"])
     tsne_embeds = tsne.fit_transform(embeddings)
     scatter(tsne_embeds, y_batch, config)

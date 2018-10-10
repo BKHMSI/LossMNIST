@@ -16,11 +16,12 @@ from model import get_model, simple_resnet
 
 def get_loss_function(func):
     return {
-        'large-margin-cosine-loss': large_margin_cos_loss(config["train"]),
-        'intra-enhanced-triplet-loss': intra_enhanced_triplet_loss(config["train"]),
-        'semi-hard-triplet-loss': semi_hard_triplet_loss(config["train"]["alpha"]),
-        'categorical-crossentropy': losses.categorical_crossentropy,
-    }.get(func, losses.categorical_crossentropy)
+        'triplet-softmax': ([semi_hard_triplet_loss(config["train"]["alpha"]), 'categorical_crossentropy'],  [1, train["lambda_2"]]),
+        'large-margin-cosine-loss': (large_margin_cos_loss(config["train"]), None),
+        'intra-enhanced-triplet-loss': (intra_enhanced_triplet_loss(config["train"]), None),
+        'semi-hard-triplet-loss': (semi_hard_triplet_loss(config["train"]["alpha"]), None),
+        'categorical-crossentropy': (losses.categorical_crossentropy, None),
+    }.get(func, (losses.categorical_crossentropy, None))
 
 if __name__ == "__main__":
 
@@ -43,10 +44,6 @@ if __name__ == "__main__":
     print("[INFO] Loading Data")
     dataloader = DataLoader(config, train["loss"]=="categorical-crossentropy")
     dataloader.load()
-    if train["loss"] in ["intra-enhanced-triplet-loss", "semi-hard-triplet-loss"]: 
-        print("[INFO] Ordering Data")
-        dataloader.order_data_triplet_loss()
-    dataloader.split_data()
 
     print("[INFO] Creating Generators")
     train_gen = DataGenerator(config).generate(dataloader.X_train, dataloader.y_train)
@@ -62,9 +59,9 @@ if __name__ == "__main__":
         model.load_weights(paths["load"], by_name=True)
 
     metric = large_margin_cos_acc(train) if train["loss"]=="large-margin-cosine-loss" else 'acc'
-    loss_func = get_loss_function(train["loss"])
+    loss_func, loss_weights = get_loss_function(train["loss"])
     optim = getattr(optimizers, train["optim"])(train["lr"])
-    model.compile(loss=loss_func, optimizer=optim, metrics=[])
+    model.compile(loss=loss_func, loss_weights=loss_weights, optimizer=optim, metrics=[])
 
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=train["lr_reduce_factor"], patience=train["patience"], min_lr=train["min_lr"])
     checkpoint = ModelCheckpoint(os.path.join(paths["save"],"model.{epoch:02d}-{val_loss:.4f}.h5"), monitor='val_loss', save_best_only=True, mode='min')

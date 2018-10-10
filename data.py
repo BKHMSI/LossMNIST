@@ -28,6 +28,20 @@ class DataLoader(object):
         self.num_val   = int(self.y_data.shape[0] * (self.config["data"]["val_split"]))
         self.num_test  = self.y_test.shape[0]
 
+        if self.config["train"]["loss"] in ["intra-enhanced-triplet-loss", "semi-hard-triplet-loss"]: 
+            print("[INFO] Ordering Data")
+            self.order_data_triplet_loss()
+
+        self.split_data()
+
+        self.mean = np.mean(self.X_train, axis=0) 
+        self.std  = np.std(self.X_train, axis=0)
+        self.std  = (self.std==0) * 1e-16 + self.std 
+
+        self.X_train = self.preprocess(self.X_train)
+        self.X_val   = self.preprocess(self.X_val)
+        self.X_test  = self.preprocess(self.X_test)
+
 
     def preprocess(self, data):
         data = data.astype('float32')
@@ -62,18 +76,11 @@ class DataLoader(object):
         self.X_val = self.X_data[self.num_train:]
         self.y_val = self.y_data[self.num_train:]
 
-        self.mean = np.mean(self.X_train, axis=0) 
-        self.std  = np.std(self.X_train, axis=0)
-        self.std  = (self.std==0) * 1e-16 + self.std 
-
-        self.X_train = self.preprocess(self.X_train)
-        self.X_val   = self.preprocess(self.X_val)
-        self.X_test  = self.preprocess(self.X_test)
         del self.X_data, self.y_data
                     
     def get_random_batch(self, k = 100):
         X_batch, y_batch = [], []
-        for label in range(self.config["num_classes"]):
+        for label in range(self.config["data"]["num_classes"]):
             X_mask = self.X_test[self.y_test==label]
             X_batch.extend(np.array([X_mask[np.random.choice(len(X_mask), k, replace=False)]]) if k <= len(X_mask) and k >= 0 else X_mask)
             y_batch += [label] * k if k <= len(X_mask) and k >= 0 else [label] * len(X_mask)
@@ -85,6 +92,8 @@ class DataGenerator(object):
     def __init__(self, config):
         self.shuffle = config["train"]["shuffle"]
         self.batch_size = config["train"]["batch-size"]
+        self.loss = config["train"]["loss"]
+        self.num_classes = config["data"]["num_classes"]
 
     def generate(self, X, y):
         ''' Generates batches of samples '''
@@ -94,12 +103,17 @@ class DataGenerator(object):
             indexes = self.__get_exploration_order(len(y))
             # Generate batches
             batches = np.arange(len(indexes)//self.batch_size)
-            np.random.shuffle(batches)
+            if not self.shuffle: np.random.shuffle(batches)
 
             for batch in batches:
                 # Find list of ids
                 batch_indecies = indexes[batch*self.batch_size:(batch+1)*self.batch_size]
-                yield X[batch_indecies], y[batch_indecies]
+                if self.loss == "triplet-softmax":
+                    y_1 = y[batch_indecies]
+                    y_2 = np_utils.to_categorical(y_1, self.num_classes)
+                    yield X[batch_indecies], [y_1, y_2]
+                else:
+                    yield X[batch_indecies], y[batch_indecies]
 
     def __get_exploration_order(self, data_size):
         ''' Generates order of exploration '''
@@ -119,4 +133,3 @@ if __name__ == "__main__":
 
     dataloader = DataLoader(config)
     dataloader.load()
-    dataloader.order_data_triplet_loss()

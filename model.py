@@ -31,9 +31,12 @@ def get_model(input_shape, config, top = True):
         return out
 
     x = __body(input_img)
-    if top: x = __head(x)
-    
-    model = Model(inputs=input_img, outputs=x)
+    if config["train"]["loss"] in ["triplet-softmax"] and top:
+        y = __head(x)
+        model = Model(inputs=input_img, outputs=[x, y])
+    else:
+        if top: x = __head(x)
+        model = Model(inputs=input_img, outputs=x)
     return model
 
 def simple_resnet(input_shape):
